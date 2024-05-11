@@ -10,7 +10,7 @@ namespace SelSender
 {
     internal class OutlookProgramHelper
     {
-        internal static void LogInToOutlook()
+        internal static void LogInToOutlook(string mail, string messageSubject, string messageBody)
         {
             IWebDriver driver = new ChromeDriver();
             driver.Navigate().GoToUrl("https://login.microsoftonline.com/common/oauth2/authorize?client_id=00000002-0000-0ff1-ce00-000000000000&redirect_uri=https%3a%2f%2foutlook.office.com%2fowa%2f&resource=00000002-0000-0ff1-ce00-000000000000&response_mode=form_post&response_type=code+id_token&scope=openid&msafed=1&msaredir=1&client-request-id=0ffa3394-8d6c-5c56-8025-2a0b70e222f8&protectedtoken=true&claims=%7b%22id_token%22%3a%7b%22xms_cc%22%3a%7b%22values%22%3a%5b%22CP1%22%5d%7d%7d%7d&nonce=638508775565220352.2add7b71-fef5-47d3-bf47-00238e550cac&state=Dcu7DoJAEEDRRf_FbmWYZZilIBYaQ6ENmmjo9kUikWCAYPx7tzi3u4kQYhttogRiBBdKE2hmooIQQRHu0XjPljPZhY5kzl5J2-UsAVDpQATOuCS-p3T8mvQwL2YJVbabgn9NwS33sTJ1A66-FpdfufpnM1ssp8tQDu3w7tsb9RZhtY_zxx71Hw&sso_reload=true");
@@ -34,16 +34,17 @@ namespace SelSender
             newMessageButton.Click();
             Thread.Sleep(3000);
             var sendTo = driver.FindElement(By.CssSelector("[aria-label='Do']"));
-            sendTo.SendKeys("xyz");
+            sendTo.SendKeys(mail);
             IWebElement subject = driver.FindElement(By.CssSelector("[placeholder='Dodaj temat']"));
 
-            subject.SendKeys("Test wysyłania wiadomości przez outlooka");
+            subject.SendKeys(messageSubject);
             var messageTextBox = driver.FindElement(By.CssSelector("div[aria-label='Treść wiadomości, naciśnij klawisze Alt+F10, aby zakończyć']"));
 
-            messageTextBox.SendKeys("No to siema\nmam nadzieję że wszystko zadziałało");
+            messageTextBox.SendKeys(messageBody);
             IWebElement sendButton = driver.FindElement(By.XPath("//button[@aria-label='Wyślij']"));
 
             sendButton.Click();
+            driver.Close();
         }
     }
 }

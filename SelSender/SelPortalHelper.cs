@@ -1,24 +1,22 @@
 ﻿using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SelSender
 {
     internal class SelPortalHelper
     {
-        internal static Dictionary<string, string> LogInToSEL()
+        internal static List<Dictionary<string, string>> LogInToSEL()
         {
-            Dictionary<string, string> expirationDates = new Dictionary<string, string>();
+            List<Dictionary<string, string>> coaches = new List<Dictionary<string, string>>();
+            Dictionary<string, string> cieloExpirationDates = new Dictionary<string, string>();
+            Dictionary<string, string> marcinsExpirationDates = new Dictionary<string, string>();
+            Dictionary<string, string> elasExpirationDates = new Dictionary<string, string>();
             IWebDriver driver = new ChromeDriver();
             driver.Navigate().GoToUrl("https://l2.polswim.pl/user");
             var insertEmail = driver.FindElement(By.CssSelector("input#edit-name.form-control.form-text.required"));
-            insertEmail.SendKeys("xxx");
+            insertEmail.SendKeys("slawek.plonka@onet.pl");
             var insertPassword = driver.FindElement(By.CssSelector("input#edit-pass.form-control.form-text.required"));
-            insertPassword.SendKeys("xxx");
+            insertPassword.SendKeys("Zosia2004");
             var loginButton = driver.FindElement(By.CssSelector("button#edit-submit.btn.btn-default.form-submit"));
             loginButton.Click();
             Thread.Sleep(1000);
@@ -38,13 +36,24 @@ namespace SelSender
                     if (Program.cieloAthletes.Contains(athleteLink.Text.Trim()))
                     {
                         Console.WriteLine($"Athlete {i + 1}: {athleteLink.Text.Trim()}\tExpiration Date: {medicalDateText}");
-                        expirationDates.Add(athleteLink.Text.Trim(), Program.WhenMedicalsAreExpiring(medicalDateText));
+                        cieloExpirationDates.Add(athleteLink.Text.Trim(), Program.WhenMedicalsAreExpiring(medicalDateText));
+                    }
+                    else if (Program.marcinsAthletes.Contains(athleteLink.Text.Trim()))
+                    {
+                        marcinsExpirationDates.Add(athleteLink.Text.Trim(), Program.WhenMedicalsAreExpiring(medicalDateText));
+                    }
+                    else if (Program.elasAthletes.Contains(athleteLink.Text.Trim()))
+                    {
+                        elasExpirationDates.Add(athleteLink.Text.Trim(), Program.WhenMedicalsAreExpiring(medicalDateText));
                     }
                 }
             }
+            coaches.Add(cieloExpirationDates);
+            coaches.Add(marcinsExpirationDates);
+            coaches.Add(elasExpirationDates);
 
             driver.Close();
-            return expirationDates;
+            return coaches;
         }
     }
 }

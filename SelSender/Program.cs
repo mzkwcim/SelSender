@@ -5,49 +5,75 @@ using System.Globalization;
 using System.Xml.Linq;
 using System.Linq;
 using ExcelToMail;
+using System.Diagnostics.Metrics;
 internal class Program
 {
     public static List<string> cieloAthletes = ["Zakens Gabriela", "POLODY ESTERA", "SIEPKA ZOFIA", "JAGŁOWSKI DAWID", "OLEJNICZAK MATEUSZ", 
         "SZMIDCHEN ALAN", "BERG MARIA", "LECHOWICZ MIKOŁAJ", "HEYMANN PATRYK", "SMYKAJ ANTONINA", "BARTOSZEWSKA MARTA", "KRZEŚNIAK JAKUB", "DOPIERAŁA PIOTR", "DROST STANISŁAW", 
         "MADELSKA NATALIA", "MAKOWSKA BLANKA", "Sumisławska Aleksandra", "SEWIŁO MARTYNA", "MROCZEK DOMINIK", "HOROWSKA ZUZANNA", "KUBIAK ZUZANNA", "KUREK ANTONI", "MALICKA MAJA", 
         "Moros Bruno","NOGALSKA IGA"];
-    public static List<string> MarcinsAthletes = [""];
+    public static List<string> marcinsAthletes = ["CHLIAHTENKO TIMOFEY", "CUDZIŁO MICHAŁ", "CZŁAPA BLANKA", "JUSZKIEWICZ-ZAPATA PIOTR", "KRYŚCIAK WOJCIECH", "KUREK FRANCISZEK",
+                                                  "LASKOWSKI FILIP", "LATANOWICZ NATALIA", "MALOVYCHKO FILIP", "MARKIEWICZ IGNACY", "MAZURKIEWICZ MARTYNA", "MIKOŁAJCZAK HELENA",
+                                                  "OCZUJDA DANIEL", "PRACHARCZYK MAKS", "RÓG ALEKSANDRA", "SMYKAJ KATARZYNA", "STEFANIAK KAROLINA", "TERTOŃ SZYMON", "Wiśniewski Leszek",
+                                                  "WOJCIECHOWSKI ANTONI", "WÓJCIK MARTA"];
+    public static List<string> elasAthletes = ["SHVETS MYKHAILO", "Brazhnyk Dmytro", "Jedwabny Maciej", "Zygnarowska Michalina", "Wrzeszczyńska Marta", "NOGAJ ALICJA",
+                                               "KRUCKI KAJETAN", "KOLAŃCZYK WIKTORIA", "Nowicka Weronika"];
     private static void Main(string[] args)
     {
-        Dictionary<string, string> expirationDates = SelPortalHelper.LogInToSEL();
+        List<Dictionary<string, string>> coaches = SelPortalHelper.LogInToSEL();
         Thread.Sleep(3000);
-        var email = driver.FindElement(By.Id("i0116"));
-        email.SendKeys("pzx110299@student.wsb.poznan.pl");
-        var nextButton = driver.FindElement(By.CssSelector("input#idSIButton9.win-button.button_primary.button.ext-button.primary.ext-primary"));
-        nextButton.Click();
-        Thread.Sleep(5000);
-        var wsbLogin = driver.FindElement(By.CssSelector("input#username"));
-        wsbLogin.SendKeys("xyz");
-        var wsbPass = driver.FindElement(By.CssSelector("input#password"));
-        wsbPass.SendKeys("xyz");
-        var login = driver.FindElement(By.Id("submitButton"));
-        login.Click();
-        Thread.Sleep(3000);
-        var btnBlack = driver.FindElement(By.Id("idBtn_Back"));
-        btnBlack.Click();
-        Thread.Sleep(7000);
-        IWebElement newMessageButton = driver.FindElement(By.XPath("//*[text()='Nowa wiadomość']"));
-        newMessageButton.Click();
-        Thread.Sleep(3000);
-        var sendTo = driver.FindElement(By.CssSelector("[aria-label='Do']"));
-        sendTo.SendKeys("xyz");
-        IWebElement subject = driver.FindElement(By.CssSelector("[placeholder='Dodaj temat']"));
-
-        // Kliknij na ten element
-        subject.SendKeys("Test wysyłania wiadomości przez outlooka");
-        var messageTextBox = driver.FindElement(By.CssSelector("div[aria-label='Treść wiadomości, naciśnij klawisze Alt+F10, aby zakończyć']"));
-
-        messageTextBox.SendKeys("No to siema\nmam nadzieję że wszystko zadziałało");
-        IWebElement sendButton = driver.FindElement(By.XPath("//button[@aria-label='Wyślij']"));
-
-        // Kliknij na ten element
-        sendButton.Click();
-
+        LibrusPortalHelper portalHelper = new LibrusPortalHelper();
+        portalHelper.LogIn("10620900", "Krakus1998!");
+        string subject = "Książeczka zdrowia";
+        int counter = 0;
+        foreach(var coach in  coaches)
+        {
+            Console.WriteLine(counter == 0 ? "Maciej i Młody" : counter == 1 ? "Marcin" : "Ela");
+            if (counter == 0 && coach.Count > 0)
+            {
+                foreach (var (key, value) in coach)
+                {
+                    Console.WriteLine(key + " " + value);
+                    string athletename = ToTitleString(key);
+                    string message = $"Dzień Dobry\n\n" +
+                                     $"przypominamy że badania {NameDecantation(athletename)} {value}\n" +
+                                     $"prosilibyśmy o ich jak najszybsze wykonanie i dostarczenie nam zdjęć ważnej książeczki sportowej\n" +
+                                     $"Z poważaniem,\n" +
+                                     $"trenerzy\n" +
+                                     $"Maciej Waliński\n" +
+                                     $"Waldek Krakowiak\n";
+                    portalHelper.SendMessage(athletename, subject, message);
+                }
+                portalHelper.Close();
+            }
+            else if (counter == 1 && coach.Count > 0)
+            {
+                string subjectForMarcin = "Badania Sportowe";
+                string messageForMarcin = "Trenerze\n\nWysyłam trenerowi listę zawodników Trenera, którzy mają nieważne karty sportowca, lub ich ważność wygasa w ciągu 14 dni:";
+                foreach (var (key, value) in coach)
+                {
+                    messageForMarcin += $"\n{ToTitleString(key)} badania {value}";
+                }
+                messageForMarcin += "Pozdrawiam,\nWaldek Krakowiak";
+                string receiver = "marcinchojnackitrener@gmail.com";
+                OutlookProgramHelper.LogInToOutlook(receiver, subjectForMarcin, messageForMarcin);
+            }
+            else if (counter == 2 && coach.Count > 0)
+            {
+                string subjectForEla = "Badania Sportowe";
+                string messageForEla = "Cześć,\n\nWysyłam Ci listę twoich zawodników, którzy mają nieważne karty sportowca, lub ich ważność wygasa w ciągu 14 dni:";
+                foreach (var (key, value) in coach)
+                {
+                    messageForEla += $"\n{ToTitleString(key)} badania {value}";
+                }
+                messageForEla += "\nPozdrawiam,\nWaldek Krakowiak";
+                string receiver = "krakowiak98@interia.pl";
+                OutlookProgramHelper.LogInToOutlook(receiver, subjectForEla, messageForEla);
+            }
+            
+            counter++;
+        }
+        
 
     }
 
@@ -61,31 +87,51 @@ internal class Program
     }
     internal static string WhenMedicalsAreExpiring(string dateString)
     {
-        IWebDriver driver = new ChromeDriver();
-        driver.Navigate().GoToUrl("https://l2.polswim.pl/user");
-        var insertEmail = driver.FindElement(By.CssSelector("input#edit-name.form-control.form-text.required"));
-        insertEmail.SendKeys("xyz");
-        var insertPassword = driver.FindElement(By.CssSelector("input#edit-pass.form-control.form-text.required"));
-        insertPassword.SendKeys("xyz");
-        var loginButton = driver.FindElement(By.CssSelector("button#edit-submit.btn.btn-default.form-submit"));
-        loginButton.Click();
-        Thread.Sleep(1000);
-        driver.Navigate().GoToUrl("https://l2.polswim.pl/my_club/zawodnicy");
-        var athletesNames = driver.FindElements(By.CssSelector("td.views-field.views-field-title"));
-        var medical = driver.FindElements(By.CssSelector("td.views-field.views-field-field-competitor-medical"));
 
-        for (int i = 0; i < athletesNames.Count; i++)
+        DateTime date = DateTime.ParseExact(dateString, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+        DateTime today = DateTime.Today;
+        var comparation = DateTime.Compare(date, today);
+        string output = date.ToString().Split(" ")[0];
+        return comparation < 0 ? $"wygasły {output}" : $"wygasają {output}";
+    }
+    public static string ToTitleString(string fullname)
+    {
+        string[] words = fullname.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        for (int i = 0; i < words.Length; i++)
         {
-            var medicalDate = medical[i];
-            var medicalDateText = medicalDate.FindElement(By.CssSelector("span.date-display-single")).Text.Trim();
-            if (Subtractor(medicalDateText))
-            {
-                var athleteName = athletesNames[i];
-                var athleteLink = athleteName.FindElement(By.CssSelector("a"));
-                Console.WriteLine($"Athlete {i + 1}: {athleteLink.Text.Trim()}\tExpiration Date: {medicalDateText}");
-            }
+            words[i] = char.ToUpper(words[i][0]) + words[i][1..].ToLower();
         }
-
-        driver.Close();
+        return string.Join(" ", words).Replace(",", "");
+    }
+    internal static string NameDecantation(string fullname)
+    {
+        var firstname = fullname.Split(" ")[1];
+        Dictionary<string, string> firstToSecondDecantation = new Dictionary<string, string>{
+            {"Marta", "Marty" },
+            {"Maria", "Marii" },
+            {"Piotr", "Piotra" },
+            {"Stanisław", "Stasia" },
+            {"Patryk", "Patryka" },
+            {"Dawid", "Dawida" },
+            {"Jakub", "Kuby" },
+            {"Mikołaj", "Mikołaja" },
+            {"Natalia", "Natalii" },
+            {"Blanka", "Blanki" },
+            {"Bruno", "Bruna" },
+            {"Mateusz", "Mateusza" },
+            {"Estera", "Estery" },
+            {"Zofia", "Zosi" },
+            {"Antonina", "Tosi" },
+            {"Alan", "Alana" },
+            {"Gabriela", "Gabrysi" },
+            {"Zuzanna", "Zuzy" },
+            {"Antoni", "Antka" },
+            {"Dominik", "Dominika" },
+            {"Iga", "Igi" },
+            {"Martyna", "Martyny" },
+            {"Maja", "Mai" },
+            {"Aleksandra", "Oli" }
+        };
+        return firstToSecondDecantation[firstname];
     }
 }
