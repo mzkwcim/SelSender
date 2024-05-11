@@ -16,25 +16,44 @@ internal class Program
     {
         Dictionary<string, string> expirationDates = SelPortalHelper.LogInToSEL();
         Thread.Sleep(3000);
-        LibrusPortalHelper portalHelper = new LibrusPortalHelper();
-        portalHelper.LogIn("xxx", "xxx");
-        string subject = "Książeczka zdrowia";
-        foreach (var (key, value) in expirationDates)
-        {
-            string athletename = ToTitleString(key);
-            string message = $"Dzień Dobry\n\n" +
-                             $"przypominamy że badania {NameDecantation(athletename)} {value}\n" +
-                             $"prosilibyśmy o ich jak najszybsze wykonanie i dostarczenie nam zdjęć ważnej książeczki sportowej\n" +
-                             $"Z poważaniem,\n" +
-                             $"trenerzy\n" +
-                             $"Maciej Waliński\n" +
-                             $"Waldek Krakowiak\n";
-            portalHelper.SendMessage(athletename, subject, message);
-        }
+        var email = driver.FindElement(By.Id("i0116"));
+        email.SendKeys("pzx110299@student.wsb.poznan.pl");
+        var nextButton = driver.FindElement(By.CssSelector("input#idSIButton9.win-button.button_primary.button.ext-button.primary.ext-primary"));
+        nextButton.Click();
+        Thread.Sleep(5000);
+        var wsbLogin = driver.FindElement(By.CssSelector("input#username"));
+        wsbLogin.SendKeys("xyz");
+        var wsbPass = driver.FindElement(By.CssSelector("input#password"));
+        wsbPass.SendKeys("xyz");
+        var login = driver.FindElement(By.Id("submitButton"));
+        login.Click();
+        Thread.Sleep(3000);
+        var btnBlack = driver.FindElement(By.Id("idBtn_Back"));
+        btnBlack.Click();
+        Thread.Sleep(7000);
+        IWebElement newMessageButton = driver.FindElement(By.XPath("//*[text()='Nowa wiadomość']"));
+        newMessageButton.Click();
+        Thread.Sleep(3000);
+        var sendTo = driver.FindElement(By.CssSelector("[aria-label='Do']"));
+        sendTo.SendKeys("xyz");
+        IWebElement subject = driver.FindElement(By.CssSelector("[placeholder='Dodaj temat']"));
+
+        // Kliknij na ten element
+        subject.SendKeys("Test wysyłania wiadomości przez outlooka");
+        var messageTextBox = driver.FindElement(By.CssSelector("div[aria-label='Treść wiadomości, naciśnij klawisze Alt+F10, aby zakończyć']"));
+
+        messageTextBox.SendKeys("No to siema\nmam nadzieję że wszystko zadziałało");
+        IWebElement sendButton = driver.FindElement(By.XPath("//button[@aria-label='Wyślij']"));
+
+        // Kliknij na ten element
+        sendButton.Click();
+
+
     }
 
     internal static bool CheckWhetherMedicalsAreExpiredOrWillExpireIn14Days(string dateString)
     {
+        //this function is made to chceck whether the medicals of athlete are up to date
         DateTime date = DateTime.ParseExact(dateString, "yyyy-MM-dd", CultureInfo.InvariantCulture);
         DateTime newDate = date.AddDays(-14);
         DateTime today = DateTime.Today;
@@ -42,50 +61,31 @@ internal class Program
     }
     internal static string WhenMedicalsAreExpiring(string dateString)
     {
-        DateTime date = DateTime.ParseExact(dateString, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-        DateTime today = DateTime.Today;
-        var comparation = DateTime.Compare(date, today);
-        string output = date.ToString().Split(" ")[0];
-        return comparation < 0 ? $"wygasły {output}" : $"wygasają {output}";
-    }
-    public static string ToTitleString(string fullname)
-    {
-        string[] words = fullname.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-        for (int i = 0; i < words.Length; i++)
+        IWebDriver driver = new ChromeDriver();
+        driver.Navigate().GoToUrl("https://l2.polswim.pl/user");
+        var insertEmail = driver.FindElement(By.CssSelector("input#edit-name.form-control.form-text.required"));
+        insertEmail.SendKeys("xyz");
+        var insertPassword = driver.FindElement(By.CssSelector("input#edit-pass.form-control.form-text.required"));
+        insertPassword.SendKeys("xyz");
+        var loginButton = driver.FindElement(By.CssSelector("button#edit-submit.btn.btn-default.form-submit"));
+        loginButton.Click();
+        Thread.Sleep(1000);
+        driver.Navigate().GoToUrl("https://l2.polswim.pl/my_club/zawodnicy");
+        var athletesNames = driver.FindElements(By.CssSelector("td.views-field.views-field-title"));
+        var medical = driver.FindElements(By.CssSelector("td.views-field.views-field-field-competitor-medical"));
+
+        for (int i = 0; i < athletesNames.Count; i++)
         {
-            words[i] = char.ToUpper(words[i][0]) + words[i][1..].ToLower();
+            var medicalDate = medical[i];
+            var medicalDateText = medicalDate.FindElement(By.CssSelector("span.date-display-single")).Text.Trim();
+            if (Subtractor(medicalDateText))
+            {
+                var athleteName = athletesNames[i];
+                var athleteLink = athleteName.FindElement(By.CssSelector("a"));
+                Console.WriteLine($"Athlete {i + 1}: {athleteLink.Text.Trim()}\tExpiration Date: {medicalDateText}");
+            }
         }
-        return string.Join(" ", words).Replace(",", "");
-    }
-    internal static string NameDecantation(string fullname)
-    {
-        var firstname = fullname.Split(" ")[1];
-        Dictionary<string, string> firstToSecondDecantation = new Dictionary<string, string>{
-            {"Marta", "Marty" },
-            {"Maria", "Marii" },
-            {"Piotr", "Piotra" },
-            {"Stanisław", "Stasia" },
-            {"Patryk", "Patryka" },
-            {"Dawid", "Dawida" },
-            {"Jakub", "Kuby" },
-            {"Mikołaj", "Mikołaja" },
-            {"Natalia", "Natalii" },
-            {"Blanka", "Blanki" },
-            {"Bruno", "Bruna" },
-            {"Mateusz", "Mateusza" },
-            {"Estera", "Estery" },
-            {"Zofia", "Zosi" },
-            {"Antonina", "Tosi" },
-            {"Alan", "Alana" },
-            {"Gabriela", "Gabrysi" },
-            {"Zuzanna", "Zuzy" },
-            {"Antoni", "Antka" },
-            {"Dominik", "Dominika" },
-            {"Iga", "Igi" },
-            {"Martyna", "Martyny" },
-            {"Maja", "Mai" },
-            {"Aleksandra", "Oli" }
-        };
-        return firstToSecondDecantation[firstname];
+
+        driver.Close();
     }
 }
