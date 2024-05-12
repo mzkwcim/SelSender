@@ -20,10 +20,15 @@ internal class Program
                                                "KRUCKI KAJETAN", "KOLAŃCZYK WIKTORIA", "Nowicka Weronika"];
     private static void Main(string[] args)
     {
+        GmailPortalHelper gmail = new GmailPortalHelper();
+        gmail.LogIn("waldemar.krakowiak98@gmail.com", "xdd");
+        gmail.SendMessage("wkrak98@gmail.com","testowa wiadomość","Szanowny Panie Waldku,\n\nZwracam się z uprzejmą prośbą o potwierdzenie czy wysłana wiadomość do Pana dotarła\n\nZ poważaniem,\nTester");
+        gmail.Close();
+        /*
         List<Dictionary<string, string>> coaches = SelPortalHelper.LogInToSEL();
         Thread.Sleep(3000);
         LibrusPortalHelper portalHelper = new LibrusPortalHelper();
-        portalHelper.LogIn("10620900", "Krakus1998!");
+        portalHelper.LogIn("10620900", "xdd");
         string subject = "Książeczka zdrowia";
         int counter = 0;
         foreach(var coach in  coaches)
@@ -56,7 +61,7 @@ internal class Program
                 }
                 messageForMarcin += "Pozdrawiam,\nWaldek Krakowiak";
                 string receiver = "marcinchojnackitrener@gmail.com";
-                OutlookProgramHelper.LogInToOutlook(receiver, subjectForMarcin, messageForMarcin);
+                OutlookPortalHelper.LogInToOutlook(receiver, subjectForMarcin, messageForMarcin);
             }
             else if (counter == 2 && coach.Count > 0)
             {
@@ -68,11 +73,12 @@ internal class Program
                 }
                 messageForEla += "\nPozdrawiam,\nWaldek Krakowiak";
                 string receiver = "krakowiak98@interia.pl";
-                OutlookProgramHelper.LogInToOutlook(receiver, subjectForEla, messageForEla);
+                OutlookPortalHelper.LogInToOutlook(receiver, subjectForEla, messageForEla);
             }
             
             counter++;
         }
+        */
         
 
     }
