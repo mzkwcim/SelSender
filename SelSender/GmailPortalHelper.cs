@@ -10,6 +10,8 @@ namespace SelSender
 {
     internal class GmailPortalHelper
     {
+        private string myMail = "waldemar.krakowiak98@gmail.com";
+        private string myPass = "Mzkwcim181099!";
         private IWebDriver driver;
         public GmailPortalHelper()
         {
@@ -18,17 +20,17 @@ namespace SelSender
             driver = new ChromeDriver(options);
         }
 
-        public void LogIn(string username, string password)
+        public void LogIn()
         {
             driver.Navigate().GoToUrl("https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fmail.google.com%2Fmail%2F&ifkv=AaSxoQyMXNrunkp2JxlSbgqxoJKWveTkOCrsy1NdIBQVdue_09SFukuyAtZNn-T-7c519Z-APsJvQA&rip=1&sacu=1&service=mail&flowName=GlifWebSignIn&flowEntry=ServiceLogin&dsh=S-1409136707%3A1715547571531990&ddm=0");
             Thread.Sleep(500);
             var email = driver.FindElement(By.XPath("//input[@aria-label='Email or phone']"));
-            email.SendKeys(username);
+            email.SendKeys(myMail);
             var buttonNext = driver.FindElement(By.XPath("//span[text()='Next']"));
             buttonNext.Click();
             Thread.Sleep(4000);
             var pass = driver.FindElement(By.XPath("//input[@aria-label='Enter your password']"));
-            pass.SendKeys(password);
+            pass.SendKeys(myPass);
             var buttonNextPass = driver.FindElement(By.XPath("//span[text()='Next']"));
             buttonNextPass.Click();
         }

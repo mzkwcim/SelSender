@@ -39,8 +39,11 @@ namespace SelSender
 
             subject.SendKeys(messageSubject);
             var messageTextBox = driver.FindElement(By.CssSelector("div[aria-label='Treść wiadomości, naciśnij klawisze Alt+F10, aby zakończyć']"));
-
             messageTextBox.SendKeys(messageBody);
+
+            var expandArrow = driver.FindElement(By.CssSelector("[data-icon-name='ChevronDown']"));
+            expandArrow.Click();
+            
             IWebElement sendButton = driver.FindElement(By.XPath("//button[@aria-label='Wyślij']"));
 
             sendButton.Click();
