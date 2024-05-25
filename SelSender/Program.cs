@@ -18,7 +18,7 @@ internal class Program
                                                   "WOJCIECHOWSKI ANTONI", "WÓJCIK MARTA"];
     public static List<string> elasAthletes = ["SHVETS MYKHAILO", "Brazhnyk Dmytro", "Jedwabny Maciej", "Zygnarowska Michalina", "Wrzeszczyńska Marta", "NOGAJ ALICJA",
                                                "KRUCKI KAJETAN", "KOLAŃCZYK WIKTORIA", "Nowicka Weronika"];
-    private static void Main(string[] args)
+    private static void Main()
     {
         List<Dictionary<string, string>> coaches = SelPortalHelper.LogInToSEL();
         Thread.Sleep(3000);
@@ -49,7 +49,8 @@ internal class Program
             }
             else if (counter == 1 && coach.Count > 0)
             {
-                OutlookProgramHelper outlook = new OutlookProgramHelper();
+                GmailPortalHelper gmail = new GmailPortalHelper();
+                
                 string subjectForMarcin = "Badania Sportowe";
                 string messageForMarcin = "Trenerze\n\nWysyłam trenerowi listę zawodników Trenera, którzy mają nieważne karty sportowca, lub ich ważność wygasa w ciągu 14 dni:";
                 foreach (var (key, value) in coach)
@@ -58,7 +59,7 @@ internal class Program
                 }
                 messageForMarcin += "\nPozdrawiam,\nWaldek Krakowiak";
                 string receiver = "marcinchojnackitrener@gmail.com";
-                OutlookProgramHelper.LogInToOutlook(receiver, subjectForMarcin, messageForMarcin);
+                gmail.SendEmail(subjectForMarcin, messageForMarcin, receiver);
             }
             else if (counter == 2 && coach.Count > 0)
             {
@@ -69,9 +70,9 @@ internal class Program
                 {
                     messageForEla += $"\n{ToTitleString(key)} badania {value}";
                 }
-                messageForEla += "\nPozdrawiam,\nWaldek Krakowiak";
+                messageForEla += "\n\nPozdrawiam,\nWaldek Krakowiak";
                 string receiver = "krakowiak98@interia.pl";
-                OutlookProgramHelper.LogInToOutlook(receiver, subjectForEla, messageForEla);
+                gmail.SendEmail(subjectForEla, messageForEla, receiver);
             }
             
             counter++;

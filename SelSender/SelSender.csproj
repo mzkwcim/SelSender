@@ -8,8 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AE.Net.Mail" Version="1.7.10" />
+    <PackageReference Include="Google.Apis.Gmail.v1" Version="1.68.0.3427" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.61" />
     <PackageReference Include="Selenium.WebDriver" Version="4.20.0" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.0-preview.4.24266.19" />
   </ItemGroup>
 
 </Project>

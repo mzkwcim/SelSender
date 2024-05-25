@@ -5,57 +5,67 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Util.Store;
+using Google.Apis.Gmail.v1.Data;
+using Google.Apis.Gmail.v1;
+using Google.Apis.Services;
+using System.Net.Mail;
 
 namespace SelSender
 {
     internal class GmailPortalHelper
     {
-        private string myMail = "waldemar.krakowiak98@gmail.com";
-        private string myPass = "Mzkwcim181099!";
-        private IWebDriver driver;
-        public GmailPortalHelper()
+        static string ApplicationName = "Gmail API .NET Quickstart";
+        private static string googleClientId = "390003761928-acg1tlb11vhni2nlm8odbarn9qclbq0a.apps.googleusercontent.com";
+        private static string googleClientSecret = "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";
+        private static UserCredential Login(string googleClientId, string googleClientSecret, string[] scopes)
         {
-            ChromeOptions options = new ChromeOptions();
-            options.AddArgument("start-maximized");
-            driver = new ChromeDriver(options);
+            ClientSecrets secrets = new ClientSecrets()
+            {
+                ClientId = googleClientId,
+                ClientSecret = googleClientSecret
+            };
+            return GoogleWebAuthorizationBroker.AuthorizeAsync(secrets, scopes, "user", CancellationToken.None, new FileDataStore("token.json", true)).Result;
         }
+        internal void SendEmail(string subject, string body, string receiver)
+        {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-        public void LogIn()
-        {
-            driver.Navigate().GoToUrl("https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fmail.google.com%2Fmail%2F&ifkv=AaSxoQyMXNrunkp2JxlSbgqxoJKWveTkOCrsy1NdIBQVdue_09SFukuyAtZNn-T-7c519Z-APsJvQA&rip=1&sacu=1&service=mail&flowName=GlifWebSignIn&flowEntry=ServiceLogin&dsh=S-1409136707%3A1715547571531990&ddm=0");
-            Thread.Sleep(500);
-            var email = driver.FindElement(By.XPath("//input[@aria-label='Email or phone']"));
-            email.SendKeys(myMail);
-            var buttonNext = driver.FindElement(By.XPath("//span[text()='Next']"));
-            buttonNext.Click();
-            Thread.Sleep(4000);
-            var pass = driver.FindElement(By.XPath("//input[@aria-label='Enter your password']"));
-            pass.SendKeys(myPass);
-            var buttonNextPass = driver.FindElement(By.XPath("//span[text()='Next']"));
-            buttonNextPass.Click();
-        }
+            string[] scopes = new string[]
+            {
+                Google.Apis.Gmail.v1.GmailService.Scope.GmailSend
+            };
+            UserCredential credential = Login(googleClientId, googleClientSecret, scopes);
+            var service = new GmailService(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = credential,
+                ApplicationName = ApplicationName,
+            });
 
-        public void SendMessage(string recipient, string subject, string message)
-        {
-            Thread.Sleep(5000);
-            var composeEmail = driver.FindElement(By.XPath("//div[contains(text(),'Compose')]"));
-            composeEmail.Click();
-            Thread.Sleep(1000);
-            var recepientTextBox = driver.FindElement(By.XPath("//input[@aria-label='To recipients']"));
-            recepientTextBox.SendKeys(recipient);
-            Thread.Sleep(1000);
-            var subjectTextBox = driver.FindElement(By.XPath("//input[@aria-label='Subject']"));
-            subjectTextBox.SendKeys(subject);
-            Thread.Sleep(1000);
-            var messageTextBox = driver.FindElement(By.XPath("//div[@aria-label='Message Body']"));
-            messageTextBox.SendKeys(message);
-            Thread.Sleep(1000);
-            var sendMessage = driver.FindElement(By.Id(":6z"));
-            sendMessage.Click();
+            var emailMessage = new AE.Net.Mail.MailMessage()
+            {
+                Subject = subject,
+                Body = body,
+                From = new MailAddress("wkrak98@gmail.com"),
+            };
+            emailMessage.To.Add(new MailAddress(receiver));
+            emailMessage.ReplyTo.Add(emailMessage.From);
+
+            var msgStr = new StringWriter();
+            emailMessage.Save(msgStr);
+
+            var result = service.Users.Messages.Send(new Message
+            {
+                Raw = Base64UrlEncode(msgStr.ToString())
+            }, "me").Execute();
+
+            Console.WriteLine("Message ID {0} sent.", result.Id);
         }
-        public void Close()
+        private static string Base64UrlEncode(string message)
         {
-            driver.Quit();
+            var inputBytes = Encoding.GetEncoding("utf-8").GetBytes(message);
+            return Convert.ToBase64String(inputBytes).Replace('+', '-').Replace('/', '_').Replace("=", "");
         }
     }
 }
