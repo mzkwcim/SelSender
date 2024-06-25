@@ -8,16 +8,9 @@ using ExcelToMail;
 using System.Diagnostics.Metrics;
 internal class Program
 {
-    public static List<string> cieloAthletes = ["Zakens Gabriela", "POLODY ESTERA", "SIEPKA ZOFIA", "JAGŁOWSKI DAWID", "OLEJNICZAK MATEUSZ", 
-        "SZMIDCHEN ALAN", "BERG MARIA", "LECHOWICZ MIKOŁAJ", "HEYMANN PATRYK", "SMYKAJ ANTONINA", "BARTOSZEWSKA MARTA", "KRZEŚNIAK JAKUB", "DOPIERAŁA PIOTR", "DROST STANISŁAW", 
-        "MADELSKA NATALIA", "MAKOWSKA BLANKA", "Sumisławska Aleksandra", "SEWIŁO MARTYNA", "MROCZEK DOMINIK", "HOROWSKA ZUZANNA", "KUBIAK ZUZANNA", "KUREK ANTONI", "MALICKA MAJA", 
-        "Moros Bruno","NOGALSKA IGA"];
-    public static List<string> marcinsAthletes = ["CHLIAHTENKO TIMOFEY", "CUDZIŁO MICHAŁ", "CZŁAPA BLANKA", "JUSZKIEWICZ-ZAPATA PIOTR", "KRYŚCIAK WOJCIECH", "KUREK FRANCISZEK",
-                                                  "LASKOWSKI FILIP", "LATANOWICZ NATALIA", "MALOVYCHKO FILIP", "MARKIEWICZ IGNACY", "MAZURKIEWICZ MARTYNA", "MIKOŁAJCZAK HELENA",
-                                                  "OCZUJDA DANIEL", "PRACHARCZYK MAKS", "RÓG ALEKSANDRA", "SMYKAJ KATARZYNA", "STEFANIAK KAROLINA", "TERTOŃ SZYMON", "Wiśniewski Leszek",
-                                                  "WOJCIECHOWSKI ANTONI", "WÓJCIK MARTA"];
-    public static List<string> elasAthletes = ["SHVETS MYKHAILO", "Brazhnyk Dmytro", "Jedwabny Maciej", "Zygnarowska Michalina", "Wrzeszczyńska Marta", "NOGAJ ALICJA",
-                                               "KRUCKI KAJETAN", "KOLAŃCZYK WIKTORIA", "Nowicka Weronika"];
+    public static List<string> cieloAthletes = ["Mine and Maciej's Athletes"];
+    public static List<string> marcinsAthletes = ["Marcin Coach Athletes"];
+    public static List<string> elasAthletes = ["Ela Coach Athletes"];
     private static void Main()
     {
         List<Dictionary<string, string>> coaches = SelPortalHelper.LogInToSEL();
@@ -30,7 +23,7 @@ internal class Program
             if (counter == 0 && coach.Count > 0)
             {
                 LibrusPortalHelper portalHelper = new LibrusPortalHelper();
-                portalHelper.LogIn("10620900", "Krakus1998!");
+                portalHelper.LogIn("xxx", "xxx");
                 string subject = "Książeczka zdrowia";
                 foreach (var (key, value) in coach)
                 {
