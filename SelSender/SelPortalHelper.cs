@@ -14,9 +14,9 @@ namespace SelSender
             IWebDriver driver = new ChromeDriver();
             driver.Navigate().GoToUrl("https://l2.polswim.pl/user");
             var insertEmail = driver.FindElement(By.CssSelector("input#edit-name.form-control.form-text.required"));
-            insertEmail.SendKeys("slawek.plonka@onet.pl");
+            insertEmail.SendKeys("xxx");
             var insertPassword = driver.FindElement(By.CssSelector("input#edit-pass.form-control.form-text.required"));
-            insertPassword.SendKeys("Zosia2004");
+            insertPassword.SendKeys("xxx");
             var loginButton = driver.FindElement(By.CssSelector("button#edit-submit.btn.btn-default.form-submit"));
             loginButton.Click();
             Thread.Sleep(1000);
