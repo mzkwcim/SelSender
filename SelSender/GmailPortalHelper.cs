@@ -17,8 +17,8 @@ namespace SelSender
     internal class GmailPortalHelper
     {
         static string ApplicationName = "Gmail API .NET Quickstart";
-        private static string googleClientId = "390003761928-acg1tlb11vhni2nlm8odbarn9qclbq0a.apps.googleusercontent.com";
-        private static string googleClientSecret = "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";
+        private static string googleClientId = "xxx";
+        private static string googleClientSecret = "xxx";
         private static UserCredential Login(string googleClientId, string googleClientSecret, string[] scopes)
         {
             ClientSecrets secrets = new ClientSecrets()
